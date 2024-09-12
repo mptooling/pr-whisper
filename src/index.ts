@@ -42,6 +42,9 @@ async function checkTsFiles(
     pullNumber: number,
     commitId: string
 ) {
+    files.forEach(function (file){
+        console.log(file)
+    })
     await createReview(owner, repo, pullNumber, commitId, [], "TEST.", "COMMENT");
 }
 

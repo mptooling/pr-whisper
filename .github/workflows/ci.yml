@@ -1,0 +1,21 @@
+name: Check PR Changes (TypeScript)
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  check-ts-changes:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: PR Whisper
+        uses: mptooling/pr-whisper@0.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
