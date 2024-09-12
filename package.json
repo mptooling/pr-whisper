@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
-    "whisper": "ts-node src/index.ts"
+    "build": "tsc"
   },
   "keywords": [],
   "author": "",
