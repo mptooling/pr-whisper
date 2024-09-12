@@ -3,5 +3,9 @@ description: "Whispers to the PR"
 author: "Pavlo Maksymov"
 
 runs:
-  using: node18
-  main: "dist/index.js"
+  using: 'docker'
+  image: 'Dockerfile'
+
+branding:
+  icon: 'terminal'
+  color: 'gray-dark'
