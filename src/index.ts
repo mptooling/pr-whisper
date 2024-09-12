@@ -1,4 +1,5 @@
 import { Octokit } from "@octokit/rest";
+// @ts-ignore
 import * as process from "process";
 
 const octokit = new Octokit({
