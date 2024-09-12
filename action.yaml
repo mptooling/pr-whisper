@@ -1,0 +1,7 @@
+name: "PR Whisper"
+description: "Whispers to the PR"
+author: "Pavlo Maksymov"
+
+runs:
+  using: node16
+  main: "dist/index.js"
