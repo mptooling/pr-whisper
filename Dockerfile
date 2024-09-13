@@ -6,7 +6,11 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 COPY *.go ./
+COPY entrypoint.sh /entrypoint.sh
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /prwhisper
+RUN #CGO_ENABLED=0 GOOS=linux go build -o /prwhisper
+RUN go build -o /prwhisper
 
-CMD ["/prwhisper"]
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
