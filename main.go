@@ -38,7 +38,6 @@ func comment(message string) {
 	token := os.Getenv("GITHUB_TOKEN")
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
-	fmt.Println(token, owner, repo, pullNumber)
 	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
 	err := reviewer.comment(message)
 	if err != nil {
