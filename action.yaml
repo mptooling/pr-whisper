@@ -6,17 +6,6 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
 
-inputs:
-    GITHUB_TOKEN:
-        description: 'GitHub Token'
-        required: true
-    GITHUB_PULL_REQUEST_NUMBER:
-        description: 'GitHub Pull Request Number'
-        required: true
-    GITHUB_REPOSITORY:
-        description: 'GitHub Repository'
-        required: true
-
 branding:
   icon: 'terminal'
   color: 'gray-dark'

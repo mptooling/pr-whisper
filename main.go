@@ -51,7 +51,7 @@ func main() {
 		panic(err)
 	}
 	for _, file := range files {
-		fmt.Println(file)
+		fmt.Printf("File: %s. Status: %s \n", file.Filename, file.Status)
 	}
 
 	comment("Hello from Go!")
