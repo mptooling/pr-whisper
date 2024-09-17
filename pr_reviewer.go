@@ -30,6 +30,8 @@ func NewPrReviewer(apiUrl string, token string, repo string, pullRequestNumber s
 func (client PrReviewer) comment(message string) error {
 	jsonData := `{"body":` + message + `}`
 
+	fmt.Println(jsonData)
+
 	req, err := http.NewRequest("POST", client.url, bytes.NewBuffer([]byte(jsonData)))
 	if err != nil {
 		panic(err)
@@ -41,10 +43,12 @@ func (client PrReviewer) comment(message string) error {
 	}
 	defer resp.Body.Close()
 
-	_, err = io.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
+
+	fmt.Println(string(b))
 
 	return nil
 }
