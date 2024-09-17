@@ -9,7 +9,7 @@ COPY *.go ./
 COPY entrypoint.sh /entrypoint.sh
 
 RUN #CGO_ENABLED=0 GOOS=linux go build -o /prwhisper
-RUN go build -o /prwhisper
+RUN go build -o /app/prwhisper
 
 RUN chmod +x /entrypoint.sh
 

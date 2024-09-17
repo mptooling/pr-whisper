@@ -19,3 +19,8 @@ jobs:
           GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
