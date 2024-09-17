@@ -7,12 +7,12 @@ import (
 	"os"
 )
 
-func getPRFiles() ([]map[string]interface{}, error) {
+func getPRFiles() (DiffEntries, error) {
 	token := os.Getenv("GITHUB_TOKEN")
-	owner := os.Getenv("GITHUB_OWNER")
-	repo := os.Getenv("GITHUB_REPO")
-	pullNumber := os.Getenv("GITHUB_PULL_NUMBER")
-	client := NewPrFilesClient("https://api.github.com", token, owner, repo, pullNumber)
+	repo := os.Getenv("GITHUB_REPOSITORY")
+	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
+	fmt.Println("token"+token, "repo"+repo, "pullNumber"+pullNumber)
+	client := NewPrFilesClient("https://api.github.com", token, repo, pullNumber)
 
 	resp, err := client.getPrFiles()
 	if err != nil {
@@ -25,7 +25,8 @@ func getPRFiles() ([]map[string]interface{}, error) {
 		return nil, err
 	}
 
-	var files []map[string]interface{}
+	fmt.Println(string(body))
+	var files DiffEntries
 	if err := json.Unmarshal(body, &files); err != nil {
 		return nil, err
 	}
@@ -34,7 +35,11 @@ func getPRFiles() ([]map[string]interface{}, error) {
 }
 
 func comment(message string) {
-	reviewer := NewPrReviewer("https://api.github.com", os.Getenv("GITHUB_TOKEN"), os.Getenv("GITHUB_OWNER"), os.Getenv("GITHUB_REPO"), os.Getenv("GITHUB_PULL_NUMBER"))
+	token := os.Getenv("GITHUB_TOKEN")
+	repo := os.Getenv("GITHUB_REPOSITORY")
+	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
+	fmt.Println(token, owner, repo, pullNumber)
+	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
 	err := reviewer.comment(message)
 	if err != nil {
 		fmt.Println("Error commenting on PR:", err)
@@ -44,11 +49,10 @@ func comment(message string) {
 func main() {
 	files, err := getPRFiles()
 	if err != nil {
-		fmt.Println("Error fetching PR files:", err)
-		return
+		panic(err)
 	}
 	for _, file := range files {
-		fmt.Println(file["filename"])
+		fmt.Println(file)
 	}
 
 	comment("Hello from Go!")

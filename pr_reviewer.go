@@ -12,8 +12,8 @@ type PrReviewer struct {
 	headers map[string]string
 }
 
-func NewPrReviewer(apiUrl string, token string, owner string, repo string, pullRequestNumber string) *PrReviewer {
-	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%s/reviews", apiUrl, owner, repo, pullRequestNumber)
+func NewPrReviewer(apiUrl string, token string, repo string, pullRequestNumber string) *PrReviewer {
+	url := fmt.Sprintf("%s/repos/%s/pulls/%s/reviews", apiUrl, repo, pullRequestNumber)
 	headers := map[string]string{
 		"Accept":               "application/vnd.github+json",
 		"Authorization":        "Bearer " + token,

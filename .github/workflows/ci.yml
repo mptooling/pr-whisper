@@ -23,4 +23,3 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          GITHUB_OWNER: ${{ github.repository_owner }}

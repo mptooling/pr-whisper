@@ -9,8 +9,9 @@ type PrFilesClient struct {
 	request *http.Request
 }
 
-func NewPrFilesClient(apiUrl string, token string, owner string, repo string, pullRequestNumber string) *PrFilesClient {
-	url := fmt.Sprintf("%s/repos/%s/%s/pulls/%s/files", apiUrl, owner, repo, pullRequestNumber)
+func NewPrFilesClient(apiUrl string, token string, repo string, pullRequestNumber string) *PrFilesClient {
+	url := fmt.Sprintf("%s/repos/%s/pulls/%s/files", apiUrl, repo, pullRequestNumber)
+	fmt.Println(url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)

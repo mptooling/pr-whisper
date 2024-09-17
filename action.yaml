@@ -13,9 +13,6 @@ inputs:
     GITHUB_PULL_REQUEST_NUMBER:
         description: 'GitHub Pull Request Number'
         required: true
-    GITHUB_OWNER:
-        description: 'Owner of the GitHub Repository'
-        required: true
     GITHUB_REPOSITORY:
         description: 'GitHub Repository'
         required: true
