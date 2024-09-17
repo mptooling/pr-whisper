@@ -15,7 +15,8 @@ jobs:
       - name: PR Whisper
         uses: ./
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_AUTH_TOKEN: ${{ secrets.PAT }}
           GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_REPOSITORY: ${{ github.repository }}
