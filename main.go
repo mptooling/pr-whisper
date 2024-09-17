@@ -35,7 +35,7 @@ func getPRFiles() (DiffEntries, error) {
 }
 
 func comment(message string) {
-	token := os.Getenv("GITHUB_TOKEN")
+	token := os.Getenv("GH_AUTH_TOKEN")
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
 	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
