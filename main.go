@@ -51,6 +51,8 @@ func main() {
 		fmt.Println("Error getting PR files:", err)
 	}
 
+	// todo :: for each affected file run whispers pool
+
 	for _, file := range files {
 		fmt.Printf("File: %s. Status: %s \n", file.Filename, file.Status)
 	}
