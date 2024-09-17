@@ -11,7 +11,6 @@ type PrFilesClient struct {
 
 func NewPrFilesClient(apiUrl string, token string, repo string, pullRequestNumber string) *PrFilesClient {
 	url := fmt.Sprintf("%s/repos/%s/pulls/%s/files", apiUrl, repo, pullRequestNumber)
-	fmt.Println(url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)

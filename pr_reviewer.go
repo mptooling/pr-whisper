@@ -18,7 +18,6 @@ func NewPrReviewer(apiUrl string, token string, repo string, pullRequestNumber s
 		"Accept":               "application/vnd.github+json",
 		"Authorization":        "Bearer " + token,
 		"X-GitHub-Api-Version": "2022-11-28",
-		"Content-Type":         "application/json",
 	}
 
 	return &PrReviewer{
@@ -28,13 +27,15 @@ func NewPrReviewer(apiUrl string, token string, repo string, pullRequestNumber s
 }
 
 func (client PrReviewer) comment(message string) error {
-	jsonData := `{"body":` + message + `}`
-
-	fmt.Println(jsonData)
+	jsonData := `{"body":"` + message + `","event": "COMMENT"}`
 
 	req, err := http.NewRequest("POST", client.url, bytes.NewBuffer([]byte(jsonData)))
 	if err != nil {
 		panic(err)
+	}
+
+	for key, value := range client.headers {
+		req.Header.Set(key, value)
 	}
 
 	resp, err := http.DefaultClient.Do(req)
@@ -43,12 +44,9 @@ func (client PrReviewer) comment(message string) error {
 	}
 	defer resp.Body.Close()
 
-	b, err := io.ReadAll(resp.Body)
+	_, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}
-
-	fmt.Println(string(b))
-
 	return nil
 }
