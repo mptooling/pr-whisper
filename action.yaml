@@ -10,7 +10,6 @@ inputs:
     GITHUB_TOKEN:
         description: 'GitHub Token'
         required: true
-        default: ${{ GITHUB_TOKEN }}
     GITHUB_PULL_REQUEST_NUMBER:
         description: 'GitHub Pull Request Number'
         required: true
