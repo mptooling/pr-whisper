@@ -12,7 +12,6 @@ func NewLaravelResourceChangedWhisper() *LaravelResourceWhisper {
 }
 
 func (w *LaravelResourceWhisper) Process(change DiffEntry) string {
-	fmt.Println("Processing LaravelResourceWhisper for file:", change.Filename)
 	if false == strings.Contains(change.Filename, "app/Http/Resources") {
 		fmt.Println("Skipping whisper for file:", change.Filename)
 
@@ -20,7 +19,12 @@ func (w *LaravelResourceWhisper) Process(change DiffEntry) string {
 	}
 
 	if change.Status == "modified" || change.Status == "added" || change.Status == "removed" || change.Status == "changed" {
-		return "Please make sure to update the [specification.yaml](https://github.com/Purpose-Green/platform-api/blob/main/resources/apidoc/specification.yaml) file."
+		message := "**API doc consistency check.**\n"
+		message += "The **" + change.Filename + "** file has been modified.\n"
+		message += "Please make sure to update the specification.yaml file."
+		message += "\n"
+
+		return message
 	}
 
 	return ""

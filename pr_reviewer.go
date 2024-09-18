@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type PrReviewer struct {
@@ -27,11 +28,18 @@ func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) *PrReviewer {
 }
 
 func (client PrReviewer) comment(message string) error {
-	jsonData := `{"body":"` + message + `","event": "COMMENT"}`
+	jsonData := `{"body":"> [!IMPORTANT]`
+	for _, line := range strings.Split(message, "\n") {
+		if line == "" {
+			continue
+		}
+		jsonData += `\n> ` + line
+	}
+	jsonData += `","event": "COMMENT"}`
 
 	req, err := http.NewRequest("POST", client.url, bytes.NewBuffer([]byte(jsonData)))
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for key, value := range client.headers {
@@ -48,5 +56,10 @@ func (client PrReviewer) comment(message string) error {
 	if err != nil {
 		return err
 	}
+
+	if resp.Status != "200 OK" {
+		return fmt.Errorf("error commenting on PR: %s", resp.Status)
+	}
+
 	return nil
 }
