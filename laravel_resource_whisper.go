@@ -12,6 +12,7 @@ func NewLaravelResourceChangedWhisper() *LaravelResourceWhisper {
 }
 
 func (w *LaravelResourceWhisper) Process(change DiffEntry) string {
+	fmt.Println("Processing LaravelResourceWhisper for file:", change.Filename)
 	if false == strings.Contains(change.Filename, "app/Http/Resources") {
 		fmt.Println("Skipping whisper for file:", change.Filename)
 

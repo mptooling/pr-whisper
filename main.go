@@ -45,6 +45,7 @@ func main() {
 	processor := NewWhisperProcessor(wp, NewPrReviewer("https://api.github.com", token, repo, pullNumber))
 
 	for _, file := range files {
+		fmt.Println("Processing file:", file.Filename)
 		processor.ProcessWhispers(file)
 	}
 }
