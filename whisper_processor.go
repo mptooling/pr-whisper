@@ -17,6 +17,7 @@ func NewWhisperProcessor(whisperPool *WhisperPool, reviewer *PrReviewer) *Whispe
 func (wp *WhisperProcessor) ProcessWhispers(change DiffEntry) {
 	for _, whisper := range wp.whisperPool.GetWhispers() {
 		go func() {
+			fmt.Println("Executed routine for file: ", change.Filename)
 			msg := whisper.Process(change)
 			err := wp.reviewer.comment(msg)
 			if err != nil {
