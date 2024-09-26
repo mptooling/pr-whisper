@@ -1,5 +1,8 @@
 # GitHub PR Whisperer
 
+![img.png](art/img2.png)
+![img.png](art/img.png)
+
 This project is a Go application designed to interact with the GitHub API to whisper to the PR if it contains rules violations.
 
 Moto: "Whisper to the PR, don't shout!"
@@ -71,15 +74,10 @@ The following environment variables need to be set for the application to functi
 
         steps:
         - name: Checkout repository
-          uses: actions/checkout@v2
-
-        - name: Set up Go
-          uses: actions/setup-go@v2
-          with:
-            go-version: 1.23
+          uses: actions/checkout@v4
 
         - name: Build and run PR Whisperer
-          uses: mptooling/pr-whisper@main # Not released yet
+          uses: mptooling/pr-whisper@v1
           env:
             GITHUB_TOKEN: ${{ github.token }}
             GH_AUTH_TOKEN: ${{ secrets.PAT }} # Requires secret named PAT
@@ -87,6 +85,83 @@ The following environment variables need to be set for the application to functi
             GITHUB_REPOSITORY: ${{ github.repository }}
             GITHUB_PULL_REQUEST_NUMBER: ${{ github.event.number }}
     ```
+
+## Available Whispers
+
+- Laravel API BC-Break Whispers
+- OAS Consistency Whispers
+- OAS Version Whispers
+
+### Laravel API BC-Break Whispers
+The `ApiBcBreakWhisper` is responsible for checking breaking changes in specific files of a Laravel project and generating comments accordingly.
+
+#### Files Checked
+
+- **Resources**: Files in the `app/Http/Resources` directory.
+- **Controllers**: Files in the `app/Http/Controllers` directory.
+- **Requests**: Files in the `app/DataTransferObjects` directory containing `Request` or `Data` in their names.
+- **Routing**: The `routes/api.php` file.
+
+#### Actions Performed
+
+- **Resources**:
+   - Checks if the file is modified or removed.
+   - Generates a warning or caution comment.
+
+- **Controllers**:
+   - Checks if the file is modified or removed.
+   - Generates a warning or caution comment.
+
+- **Requests**:
+   - Checks if the file is modified or removed.
+   - Generates a warning or caution comment.
+
+- **Routing**:
+   - Checks if the `routes/api.php` file is modified.
+   - Generates a warning comment.
+
+### OAS Consistency Whispers
+
+The `OasConsistencyWhisper` struct is responsible for checking consistency with the OpenAPI Specification (OAS) in specific files of a Laravel project and generating comments accordingly.
+
+#### Files Checked
+
+- **Resources**: Files in the `app/Http/Resources` directory.
+- **Controllers**: Files in the `app/Http/Controllers` directory.
+- **Requests**: Files in the `app/DataTransferObjects` directory containing `Request` or `Data` in their names.
+- **Routing**: The `routes/api.php` file.
+
+#### Actions Performed
+
+- **Resources**:
+   - Checks if the file is modified, added, removed, or changed.
+   - Generates a comment to remind updating the `specification.yaml` file.
+
+- **Controllers**:
+   - Checks if the file is modified, added, removed, or changed.
+   - Generates a comment to remind updating the `specification.yaml` file.
+
+- **Requests**:
+   - Checks if the file is modified, added, or removed.
+   - Generates a comment to remind updating the `specification.yaml` file.
+
+- **Routing**:
+   - Checks if the `routes/api.php` file is modified.
+   - Generates a comment to remind updating the `specification.yaml` file.
+
+### OAS Version Whispers
+
+#### Files Checked
+
+- **Specification**: The `resources/apidoc/specification.yaml` file.
+
+#### Actions Performed
+
+- **Specification**:
+   - Checks if the `specification.yaml` file is modified.
+   - Verifies if the `openapi` version has been changed in the patch.
+   - Generates a comment to remind updating the `openapi` version in the `specification.yaml` file if it has not been updated.
+
 
 ## License
 

@@ -7,11 +7,8 @@ import (
 	"os"
 )
 
-func getPRFiles() (DiffEntries, error) {
-	token := os.Getenv("GITHUB_TOKEN")
-	repo := os.Getenv("GITHUB_REPOSITORY")
-	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
-	client := NewPrFilesClient("https://api.github.com", token, repo, pullNumber)
+func getPRFiles(token, repo, pullRequestNumber string) (DiffEntries, error) {
+	client := NewPrFilesClient("https://api.github.com", token, repo, pullRequestNumber)
 
 	resp, err := client.getPrFiles()
 	if err != nil {
@@ -32,33 +29,21 @@ func getPRFiles() (DiffEntries, error) {
 	return files, nil
 }
 
-func comment(message string) error {
+func main() {
 	token := os.Getenv("GH_AUTH_TOKEN")
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
-	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
-	err := reviewer.comment(message)
-	if err != nil {
-		return err
-	}
 
-	return nil
-}
-
-func main() {
-	files, err := getPRFiles()
+	files, err := getPRFiles(token, repo, pullNumber)
 	if err != nil {
 		fmt.Println("Error getting PR files:", err)
+		return
 	}
 
-	// todo :: for each affected file run whispers pool
-
-	for _, file := range files {
-		fmt.Printf("File: %s. Status: %s \n", file.Filename, file.Status)
-	}
-
-	err = comment("Hello from Go!")
-	if err != nil {
-		fmt.Println("Error commenting on PR:", err)
-	}
+	wp := NewWhisperPool()
+	wp.AddWhisper(NewOasConsistencyWhisper())
+	wp.AddWhisper(NewApiBcBreakWhisper())
+	wp.AddWhisper(NewOasVersionWhisper())
+	processor := NewWhisperProcessor(wp, NewPrReviewer("https://api.github.com", token, repo, pullNumber))
+	processor.ProcessWhispers(files)
 }
