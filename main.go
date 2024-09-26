@@ -41,10 +41,9 @@ func main() {
 	}
 
 	wp := NewWhisperPool()
-	wp.AddWhisper(NewLaravelResourceChangedWhisper())
+	wp.AddWhisper(NewOasConsistencyWhisper())
+	wp.AddWhisper(NewApiBcBreakWhisper())
+	wp.AddWhisper(NewOasVersionWhisper())
 	processor := NewWhisperProcessor(wp, NewPrReviewer("https://api.github.com", token, repo, pullNumber))
-
-	for _, file := range files {
-		processor.ProcessWhispers(file)
-	}
+	processor.ProcessWhispers(files)
 }
