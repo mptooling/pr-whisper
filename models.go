@@ -49,3 +49,20 @@ type PrReviewComment struct {
 	Position int    `json:"position"`
 	Body     string `json:"body"`
 }
+
+type WhisperConfig struct {
+	Whispers []WhisperConfigItem `yaml:"whispers"`
+}
+
+type WhisperConfigItem struct {
+	Name     string    `yaml:"name"`
+	Triggers []Trigger `yaml:"triggers"`
+	Severity string    `yaml:"severity"`
+	Message  string    `yaml:"message"`
+}
+
+type Trigger struct {
+	Check        string   `yaml:"check"`
+	Contains     string   `yaml:"contains,omitempty"`
+	FileStatuses []string `yaml:"file_statuses,omitempty"`
+}
