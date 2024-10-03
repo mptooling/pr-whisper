@@ -3,11 +3,11 @@ package main
 import "fmt"
 
 type WhisperProcessor struct {
-	whisperPool *WhisperPool
+	whisperPool []*GenericWhisperer
 	reviewer    *PrReviewer
 }
 
-func NewWhisperProcessor(whisperPool *WhisperPool, reviewer *PrReviewer) *WhisperProcessor {
+func NewWhisperProcessor(whisperPool []*GenericWhisperer, reviewer *PrReviewer) *WhisperProcessor {
 	return &WhisperProcessor{
 		whisperPool: whisperPool,
 		reviewer:    reviewer,
@@ -17,13 +17,7 @@ func NewWhisperProcessor(whisperPool *WhisperPool, reviewer *PrReviewer) *Whispe
 func (wp *WhisperProcessor) ProcessWhispers(changes DiffEntries) {
 	comments := make([]*Comment, 0)
 	for _, change := range changes {
-		for _, whisper := range wp.whisperPool.GetWhispers() {
-			comment := whisper.Process(change, changes)
-			if comment != nil && comment.Content != "" {
-				comments = append(comments, comment)
-			}
-		}
-
+		wp.processChange(change, changes, comments)
 	}
 
 	err := wp.reviewer.comment(comments)
@@ -32,4 +26,27 @@ func (wp *WhisperProcessor) ProcessWhispers(changes DiffEntries) {
 
 		return
 	}
+}
+
+func (wp *WhisperProcessor) processChange(change DiffEntry, changes DiffEntries, comments []*Comment) {
+	for _, whisper := range wp.whisperPool {
+		wp.runWhisperer(whisper, change, changes, comments)
+	}
+}
+
+func (wp *WhisperProcessor) runWhisperer(w *GenericWhisperer, change DiffEntry, changes DiffEntries, comments []*Comment) {
+	for _, check := range w.Trigger.checks {
+		if false == check(change, changes) {
+			return
+		}
+	}
+
+	comments = append(comments, &Comment{
+		WhisperName: w.Name,
+		Content:     w.Message,
+		Type:        w.Severity,
+		FilePath:    change.Filename,
+		Position:    0,
+		CommitID:    change.Sha,
+	})
 }

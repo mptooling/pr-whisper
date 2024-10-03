@@ -33,11 +33,6 @@ type Comment struct {
 	CommitID    string
 }
 
-type PRInspiration struct {
-	Body  string `json:"body"`
-	Event string `json:"event"`
-}
-
 type PRReview struct {
 	Body     string            `json:"body"`
 	Event    string            `json:"event"`
