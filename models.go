@@ -38,12 +38,6 @@ type PRReview struct {
 	Event string `json:"event"`
 }
 
-type PrReviewComment struct {
-	Path     string `json:"path"`
-	Position int    `json:"position"`
-	Body     string `json:"body"`
-}
-
 type WhisperConfig struct {
 	Whispers []WhisperConfigItem `yaml:"whispers"`
 }

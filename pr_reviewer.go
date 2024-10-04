@@ -46,12 +46,12 @@ func (client PrReviewer) commentWhispers(comments []*Comment) error {
 		content[comment.WhisperName] = append(content[comment.WhisperName], *comment)
 	}
 
-	body := `<details>` + "\n\n" + `<summary>🤫 Psst... Here is a list of potential issues:</summary>` + "\n\n"
+	body := `<details>` + "\n\n" + `<summary>🤫 Psst... Here is a list of potential issues:</summary>` + "\n"
 	for whisperName, commentList := range content {
 		emoji := client.getEmojiForSection(comments[0].Severity)
-		body += fmt.Sprintf("%s %s\n", emoji, whisperName)
+		body += fmt.Sprintf("\n%s %s\n", emoji, whisperName)
 		for _, comment := range commentList {
-			body += fmt.Sprintf("- [ ] Affected file %s. %s\n", comment.FilePath, comment.Content)
+			body += fmt.Sprintf("- [ ] Affected file `%s`. %s\n", comment.FilePath, comment.Content) // todo :: must be configurable
 		}
 	}
 
