@@ -1,12 +1,13 @@
 package main
 
-import "strings"
+import (
+	"strings"
+)
 
 type CommentCondition func(DiffEntry, DiffEntries) bool
 
 type trigger struct {
-	checks       []CommentCondition
-	fileStatuses []string
+	checks []CommentCondition
 }
 
 type GenericWhisperer struct {
@@ -25,30 +26,44 @@ func NewGenericWhispererFactory() *GenericWhispererFactory {
 func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*GenericWhisperer {
 	whispers := make([]*GenericWhisperer, 0)
 	for _, whisper := range config.Whispers {
+		if whisper.Triggers == nil || len(whisper.Triggers) == 0 {
+			continue
+		}
+
 		checks := make([]CommentCondition, 0)
 		for _, trigger := range whisper.Triggers {
 			if trigger.Check == "filepath" {
 				checks = append(checks, func(change DiffEntry, changes DiffEntries) bool {
 					return strings.Contains(change.Filename, trigger.Contains)
 				})
+
+				continue
 			}
 
-			if trigger.Check == "no_filepath_in_pr_files" {
+			if trigger.Check == "file_not_in_pr" {
+				filePath := trigger.Contains
 				checks = append(checks, func(change DiffEntry, changes DiffEntries) bool {
 					for _, c := range changes {
-						if strings.Contains(c.Filename, trigger.Contains) {
+						if strings.Contains(c.Filename, filePath) {
 							return false
 						}
 					}
 					return true
 				})
-			}
-		}
 
-		fileStatuses := make([]string, 0)
-		for _, trigger := range whisper.Triggers {
-			if trigger.FileStatuses != nil {
-				fileStatuses = trigger.FileStatuses
+				continue
+			}
+
+			if trigger.Check == "file_status" {
+				checks = append(checks, func(change DiffEntry, changes DiffEntries) bool {
+					statuses := strings.Split(trigger.Contains, ",")
+					for _, fileStatus := range statuses {
+						if change.Status == fileStatus {
+							return true
+						}
+					}
+					return false
+				})
 			}
 		}
 
@@ -69,8 +84,7 @@ func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*G
 		whispers = append(whispers, &GenericWhisperer{
 			Name: whisper.Name,
 			Trigger: trigger{
-				checks:       checks,
-				fileStatuses: fileStatuses,
+				checks: checks,
 			},
 			Severity: severity,
 			Message:  whisper.Message,

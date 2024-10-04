@@ -57,7 +57,6 @@ type WhisperConfigItem struct {
 }
 
 type Trigger struct {
-	Check        string   `yaml:"check"`
-	Contains     string   `yaml:"contains,omitempty"`
-	FileStatuses []string `yaml:"file_statuses,omitempty"`
+	Check    string `yaml:"check"`
+	Contains string `yaml:"contains,omitempty"`
 }

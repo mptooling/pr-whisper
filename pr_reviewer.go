@@ -8,6 +8,10 @@ import (
 	"net/http"
 )
 
+type PrClient interface {
+	comment([]*Comment) error
+}
+
 type PrReviewer struct {
 	url     string
 	headers map[string]string
@@ -29,6 +33,7 @@ func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) *PrReviewer {
 
 func (client PrReviewer) comment(comments []*Comment) error {
 	if len(comments) == 0 {
+		fmt.Println("No comments to make")
 		return nil
 	}
 
@@ -71,6 +76,9 @@ func (client PrReviewer) commentWhispers(comments []*Comment) error {
 
 	jsonData, err := json.Marshal(review)
 	if err != nil {
+		fmt.Println("Error marshalling JSON:", err)
+		fmt.Println("Review:", review)
+
 		return err
 	}
 
@@ -80,6 +88,9 @@ func (client PrReviewer) commentWhispers(comments []*Comment) error {
 func (client PrReviewer) send(jsonData []byte) error {
 	req, err := http.NewRequest("POST", client.url, bytes.NewBuffer(jsonData))
 	if err != nil {
+		fmt.Println("Error creating request:", err)
+		fmt.Println("Data:", jsonData)
+
 		return err
 	}
 
@@ -89,12 +100,19 @@ func (client PrReviewer) send(jsonData []byte) error {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		fmt.Println("Error sending req:", err)
+		fmt.Println("req:", req)
+		fmt.Println("resp:", resp)
+
 		return err
 	}
 	defer resp.Body.Close()
 
 	data, err := io.ReadAll(resp.Body)
+
 	if err != nil {
+		fmt.Println("Error sending req:", err)
+
 		return err
 	}
 

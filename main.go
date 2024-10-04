@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// todo :: move to client adapter
 func getPRFiles(token, repo, pullRequestNumber string) (DiffEntries, error) {
 	client := NewPrFilesClient("https://api.github.com", token, repo, pullRequestNumber)
 
@@ -42,9 +43,12 @@ func main() {
 	}
 
 	factory := NewGenericWhispererFactory()
+
 	whispers := factory.MakeGenericWhispers(whispersConfig)
 
 	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
+
+	processor := NewWhisperProcessor(whispers, reviewer)
 
 	files, err := getPRFiles(token, repo, pullNumber)
 	if err != nil {
@@ -52,6 +56,5 @@ func main() {
 		return
 	}
 
-	processor := NewWhisperProcessor(whispers, reviewer)
 	processor.ProcessWhispers(files)
 }

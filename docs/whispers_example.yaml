@@ -3,24 +3,27 @@ whispers:
         triggers:
             -   check: "filepath"
                 contains: "app/Http/Resources"
+            -   check: "file_statuses"
+                contains: "modified,removed"
         severity: "caution"
-        message: "This change may break the API contract. Please review the API documentation."
+        message: "This change may break the API contract."
 
     -   name: "Controller BC break"
         triggers:
             -   check: "filepath"
                 contains: "app/Http/Controllers"
+            -   check: "file_statuses"
+                contains: "modified,removed"
         severity: "caution"
-        message: "This change may break the API contract. Please review the API documentation."
+        message: "This change may break the API contract."
 
     -   name: "Specification Consistency. Resource change"
-        trigger:
-            -   file_statuses: ["modified", "added", "removed"]
+        triggers:
+            -   check: "file_statuses"
+                contains: "modified,added,removed"
             -   check: "filepath"
                 contains: "app/Http/Resources"
-            -   check: "filepath"
-                contains: "app/Http/Resources"
-            -   check: "no_filepath_in_pr_files"
+            -   check: "file_not_in_pr"
                 contains: "resources/apidoc/specification.yaml"
         severity: "warning"
         message: "Please update resources/apidoc/specification.yaml."
