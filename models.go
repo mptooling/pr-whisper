@@ -27,16 +27,15 @@ type DiffEntries []DiffEntry
 type Comment struct {
 	WhisperName string
 	Content     string
-	Type        int
+	Severity    int
 	FilePath    string
 	Position    int
 	CommitID    string
 }
 
 type PRReview struct {
-	Body     string            `json:"body"`
-	Event    string            `json:"event"`
-	Comments []PrReviewComment `json:"comments"`
+	Body  string `json:"body"`
+	Event string `json:"event"`
 }
 
 type PrReviewComment struct {

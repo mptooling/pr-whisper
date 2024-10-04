@@ -41,37 +41,25 @@ func (client PrReviewer) comment(comments []*Comment) error {
 }
 
 func (client PrReviewer) commentWhispers(comments []*Comment) error {
-	var commentType string
-	var cs []PrReviewComment
-	commentTypeString := Note
-	for _, c := range comments {
-		if c.Type > commentTypeString {
-			commentTypeString = c.Type
-		}
+	content := make(map[string][]Comment)
+	for _, comment := range comments {
+		content[comment.WhisperName] = append(content[comment.WhisperName], *comment)
+	}
 
-		cs = append(cs, PrReviewComment{
-			Path:     c.FilePath,
-			Position: c.Position,
-			Body:     c.Content,
-		})
+	body := `<details>` + "\n\n" + `<summary>🤫 Psst... Here is a list of potential issues:</summary>` + "\n\n"
+	for whisperName, commentList := range content {
+		emoji := client.getEmojiForSection(comments[0].Severity)
+		body += fmt.Sprintf("%s %s\n", emoji, whisperName)
+		for _, comment := range commentList {
+			body += fmt.Sprintf("- [ ] Affected file %s. %s\n", comment.FilePath, comment.Content)
+		}
 	}
-	switch commentTypeString {
-	case Important:
-		commentType = "IMPORTANT"
-	case Caution:
-		commentType = "CAUTION"
-	case Warning:
-		commentType = "WARNING"
-	case Tip:
-		commentType = "TIP"
-	default:
-		commentType = "NOTE"
-	}
+
+	body += "\n" + `</details>` + "\n"
 
 	review := PRReview{
-		Body:     `> [!` + commentType + `]` + "\n" + `> ` + client.randomIntroString(commentTypeString) + "\n",
-		Event:    "COMMENT",
-		Comments: cs,
+		Body:  body,
+		Event: "COMMENT",
 	}
 
 	jsonData, err := json.Marshal(review)
@@ -125,15 +113,15 @@ func (client PrReviewer) send(jsonData []byte) error {
 	return nil
 }
 
-func (client PrReviewer) randomIntroString(severityLevel int) string {
-	switch severityLevel {
-	case Caution:
-		return "Critical feedback incoming! 🚨"
+func (client PrReviewer) getEmojiForSection(severity int) string {
+	switch severity {
 	case Important:
-		return "Important feedback incoming! 🚨"
+		return "🟣"
 	case Warning:
-		return "Warning! 🚨"
+		return "🟠"
+	case Caution:
+		return "🔴"
 	default:
-		return "Just a note! 📝"
+		return "🟢"
 	}
 }

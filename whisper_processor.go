@@ -57,7 +57,7 @@ func (wp *WhisperProcessor) runWhisperer(w *GenericWhisperer, change DiffEntry, 
 	return &Comment{
 		WhisperName: w.Name,
 		Content:     w.Message,
-		Type:        w.Severity,
+		Severity:    w.Severity,
 		FilePath:    change.Filename,
 		Position:    1,
 		CommitID:    change.Sha,
