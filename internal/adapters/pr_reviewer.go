@@ -9,6 +9,8 @@ import (
 	"net/http"
 )
 
+const eventComment = "COMMENT"
+
 type prReviewer struct {
 	url     string
 	headers map[string]string
@@ -31,6 +33,7 @@ func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) PrReviewer {
 func (client prReviewer) Comment(comments []*domain.Comment) error {
 	if len(comments) == 0 {
 		fmt.Println("No comments to make")
+
 		return nil
 	}
 
@@ -43,6 +46,22 @@ func (client prReviewer) commentWhispers(comments []*domain.Comment) error {
 		content[comment.WhisperName] = append(content[comment.WhisperName], *comment)
 	}
 
+	review := domain.PRReview{
+		Body:  client.createPrComment(content),
+		Event: eventComment,
+	}
+
+	jsonData, err := json.Marshal(review)
+	if err != nil {
+		fmt.Println("Review:", review)
+
+		return err
+	}
+
+	return client.send(jsonData)
+}
+
+func (client prReviewer) createPrComment(content map[string][]domain.Comment) string {
 	body := `<details>` + "\n\n" + `<summary>🤫 Psst... Here is a list of potential issues:</summary>` + "\n"
 	for whisperName, commentList := range content {
 		emoji := client.getEmojiForSection(commentList[0].Severity)
@@ -54,20 +73,7 @@ func (client prReviewer) commentWhispers(comments []*domain.Comment) error {
 
 	body += "\n" + `</details>` + "\n"
 
-	review := domain.PRReview{
-		Body:  body,
-		Event: "COMMENT",
-	}
-
-	jsonData, err := json.Marshal(review)
-	if err != nil {
-		fmt.Println("Error marshalling JSON:", err)
-		fmt.Println("Review:", review)
-
-		return err
-	}
-
-	return client.send(jsonData)
+	return body
 }
 
 func (client prReviewer) send(jsonData []byte) error {

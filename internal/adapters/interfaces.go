@@ -2,7 +2,6 @@ package adapters
 
 import (
 	"github.com/mptooling/pr-whisper/internal/domain"
-	"net/http"
 )
 
 type PrReviewer interface {
@@ -10,5 +9,5 @@ type PrReviewer interface {
 }
 
 type PrFilesClient interface {
-	GetPrFiles() (*http.Response, error)
+	GetPrFiles() (domain.DiffEntries, error)
 }

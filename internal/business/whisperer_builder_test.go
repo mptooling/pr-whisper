@@ -22,7 +22,7 @@ func TestMakeGenericWhispers_ValidConfig(t *testing.T) {
 		},
 	}
 
-	factory := NewGenericWhispererFactory()
+	factory := NewGenericWhispererBuilder()
 	whispers := factory.MakeGenericWhispers(config)
 
 	if len(whispers) != 1 {

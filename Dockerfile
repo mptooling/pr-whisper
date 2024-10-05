@@ -17,11 +17,10 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 
-COPY *.go ./
+COPY . .
 COPY entrypoint.sh /entrypoint.sh
 
-RUN #CGO_ENABLED=0 GOOS=linux go build -o /prwhisper
-RUN go build -o /pr-whisper/prwhisper
+RUN go build -o /app/prwhisper ./cmd/pr-whisper/main.go
 
 RUN chmod +x /entrypoint.sh
 
