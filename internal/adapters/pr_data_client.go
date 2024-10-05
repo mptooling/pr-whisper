@@ -1,15 +1,18 @@
 package adapters
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/mptooling/pr-whisper/internal/domain"
+	"io"
 	"net/http"
 )
 
-type PrFilesClient struct {
+type prFilesClient struct {
 	request *http.Request
 }
 
-func NewPrFilesClient(apiUrl string, token string, repo string, pullRequestNumber string) *PrFilesClient {
+func NewPrDataClient(apiUrl string, token string, repo string, pullRequestNumber string) PrFilesClient {
 	url := fmt.Sprintf("%s/repos/%s/pulls/%s/files", apiUrl, repo, pullRequestNumber)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -20,12 +23,12 @@ func NewPrFilesClient(apiUrl string, token string, repo string, pullRequestNumbe
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
 
-	return &PrFilesClient{
+	return &prFilesClient{
 		request: req,
 	}
 }
 
-func (client PrFilesClient) GetPrFiles() (*http.Response, error) {
+func (client prFilesClient) GetPrFiles() (domain.DiffEntries, error) {
 	resp, err := http.DefaultClient.Do(client.request)
 	fmt.Println("Request:", client.request)
 	fmt.Println("Response:", resp)
@@ -36,5 +39,20 @@ func (client PrFilesClient) GetPrFiles() (*http.Response, error) {
 		return nil, err
 	}
 
-	return resp, nil
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var files domain.DiffEntries
+	if err := json.Unmarshal(body, &files); err != nil {
+		return nil, err
+	}
+
+	return files, nil
 }

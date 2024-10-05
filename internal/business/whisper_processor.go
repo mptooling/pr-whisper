@@ -1,24 +1,23 @@
 package business
 
 import (
-	"fmt"
 	"github.com/mptooling/pr-whisper/internal/adapters"
 	"github.com/mptooling/pr-whisper/internal/domain"
 )
 
-type WhisperProcessor struct {
+type whisperProcessor struct {
 	whisperPool []*domain.GenericWhisperer
-	reviewer    adapters.PrClient
+	reviewer    adapters.PrReviewer
 }
 
-func NewWhisperProcessor(whisperPool []*domain.GenericWhisperer, reviewer adapters.PrClient) *WhisperProcessor {
-	return &WhisperProcessor{
+func NewWhisperProcessor(whisperPool []*domain.GenericWhisperer, reviewer adapters.PrReviewer) WhisperProcessor {
+	return &whisperProcessor{
 		whisperPool: whisperPool,
 		reviewer:    reviewer,
 	}
 }
 
-func (wp *WhisperProcessor) ProcessWhispers(changes domain.DiffEntries) {
+func (wp *whisperProcessor) ProcessWhispers(changes domain.DiffEntries) error {
 	comments := make([]*domain.Comment, 0)
 	for _, change := range changes {
 		for _, c := range wp.processChange(change, changes) {
@@ -26,16 +25,15 @@ func (wp *WhisperProcessor) ProcessWhispers(changes domain.DiffEntries) {
 		}
 	}
 
-	fmt.Println("collected comments:", comments)
 	err := wp.reviewer.Comment(comments)
 	if err != nil {
-		fmt.Println("Error commenting on PR:", err)
-
-		return
+		return err
 	}
+
+	return nil
 }
 
-func (wp *WhisperProcessor) processChange(change domain.DiffEntry, changes domain.DiffEntries) []*domain.Comment {
+func (wp *whisperProcessor) processChange(change domain.DiffEntry, changes domain.DiffEntries) []*domain.Comment {
 	comments := make([]*domain.Comment, 0)
 	for _, whisper := range wp.whisperPool {
 		c := wp.runWhisperer(whisper, change, changes)
@@ -47,7 +45,7 @@ func (wp *WhisperProcessor) processChange(change domain.DiffEntry, changes domai
 	return comments
 }
 
-func (wp *WhisperProcessor) runWhisperer(w *domain.GenericWhisperer, change domain.DiffEntry, changes domain.DiffEntries) *domain.Comment {
+func (wp *whisperProcessor) runWhisperer(w *domain.GenericWhisperer, change domain.DiffEntry, changes domain.DiffEntries) *domain.Comment {
 	if len(w.Trigger.Checks) == 0 {
 		return nil
 	}

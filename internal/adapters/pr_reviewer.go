@@ -9,16 +9,14 @@ import (
 	"net/http"
 )
 
-type PrClient interface {
-	Comment([]*domain.Comment) error
-}
+const eventComment = "COMMENT"
 
-type PrReviewer struct {
+type prReviewer struct {
 	url     string
 	headers map[string]string
 }
 
-func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) *PrReviewer {
+func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) PrReviewer {
 	url := fmt.Sprintf("%s/repos/%s/pulls/%s/reviews", apiUrl, repo, pullRequestNumber)
 	headers := map[string]string{
 		"Accept":               "application/vnd.github+json",
@@ -26,27 +24,44 @@ func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) *PrReviewer {
 		"X-GitHub-Api-Version": "2022-11-28",
 	}
 
-	return &PrReviewer{
+	return &prReviewer{
 		url:     url,
 		headers: headers,
 	}
 }
 
-func (client PrReviewer) Comment(comments []*domain.Comment) error {
+func (client prReviewer) Comment(comments []*domain.Comment) error {
 	if len(comments) == 0 {
 		fmt.Println("No comments to make")
+
 		return nil
 	}
 
 	return client.commentWhispers(comments)
 }
 
-func (client PrReviewer) commentWhispers(comments []*domain.Comment) error {
+func (client prReviewer) commentWhispers(comments []*domain.Comment) error {
 	content := make(map[string][]domain.Comment)
 	for _, comment := range comments {
 		content[comment.WhisperName] = append(content[comment.WhisperName], *comment)
 	}
 
+	review := domain.PRReview{
+		Body:  client.createPrComment(content),
+		Event: eventComment,
+	}
+
+	jsonData, err := json.Marshal(review)
+	if err != nil {
+		fmt.Println("Review:", review)
+
+		return err
+	}
+
+	return client.send(jsonData)
+}
+
+func (client prReviewer) createPrComment(content map[string][]domain.Comment) string {
 	body := `<details>` + "\n\n" + `<summary>🤫 Psst... Here is a list of potential issues:</summary>` + "\n"
 	for whisperName, commentList := range content {
 		emoji := client.getEmojiForSection(commentList[0].Severity)
@@ -58,23 +73,10 @@ func (client PrReviewer) commentWhispers(comments []*domain.Comment) error {
 
 	body += "\n" + `</details>` + "\n"
 
-	review := domain.PRReview{
-		Body:  body,
-		Event: "COMMENT",
-	}
-
-	jsonData, err := json.Marshal(review)
-	if err != nil {
-		fmt.Println("Error marshalling JSON:", err)
-		fmt.Println("Review:", review)
-
-		return err
-	}
-
-	return client.send(jsonData)
+	return body
 }
 
-func (client PrReviewer) send(jsonData []byte) error {
+func (client prReviewer) send(jsonData []byte) error {
 	req, err := http.NewRequest("POST", client.url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		fmt.Println("Error creating request:", err)
@@ -114,7 +116,7 @@ func (client PrReviewer) send(jsonData []byte) error {
 	return nil
 }
 
-func (client PrReviewer) getEmojiForSection(severity int) string {
+func (client prReviewer) getEmojiForSection(severity int) string {
 	switch severity {
 	case domain.Important:
 		return "🟣"
