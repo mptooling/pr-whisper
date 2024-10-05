@@ -7,8 +7,8 @@ Moto: "Whisper to the PR, don't shout!"
 # TODO
 - [ ] Configuration validation
 - [ ] Log only in debug mode in workflow
-- [ ] Readable configuration. Must be like human language. Example `if Filepath contains "app/Http/Controllers" and file status is in "modified, removed" then whisper "Please update the specification.yaml file"`
-- [ ] Restructure
+- [ ] Readable configuration. It must be like human language. For example `if Filepath contains "app/Http/Controllers" and file status is in "modified, removed" then whisper "Please update the specification.yaml file"`
+- [x] Restructure
 - [ ] Tests
 - [ ] Contribution guide
 - [ ] Issue template
