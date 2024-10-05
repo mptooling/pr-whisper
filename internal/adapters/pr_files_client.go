@@ -1,4 +1,4 @@
-package main
+package adapters
 
 import (
 	"fmt"
@@ -27,7 +27,12 @@ func NewPrFilesClient(apiUrl string, token string, repo string, pullRequestNumbe
 
 func (client PrFilesClient) getPrFiles() (*http.Response, error) {
 	resp, err := http.DefaultClient.Do(client.request)
+	fmt.Println("Request:", client.request)
+	fmt.Println("Response:", resp)
+
 	if err != nil {
+		fmt.Println("Error getting PR files:", err)
+
 		return nil, err
 	}
 

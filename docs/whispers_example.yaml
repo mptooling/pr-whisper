@@ -1,0 +1,30 @@
+whispers:
+    -   name: "Resource BC break"
+        triggers:
+            -   check: "filepath"
+                contains: "pr-whisper/Http/Resources"
+            -   check: "file_statuses"
+                contains: "modified,removed"
+        severity: "caution"
+        message: "This change may break the API contract."
+
+    -   name: "Controller BC break"
+        triggers:
+            -   check: "filepath"
+                contains: "pr-whisper/Http/Controllers"
+            -   check: "file_statuses"
+                contains: "modified,removed"
+        severity: "caution"
+        message: "This change may break the API contract."
+
+    -   name: "Specification Consistency. Resource change"
+        triggers:
+            -   check: "file_statuses"
+                contains: "modified,added,removed"
+            -   check: "filepath"
+                contains: "pr-whisper/Http/Resources"
+            -   check: "file_not_in_pr"
+                contains: "resources/apidoc/specification.yaml"
+        severity: "warning"
+        message: "Please update resources/apidoc/specification.yaml."
+

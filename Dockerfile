@@ -1,8 +1,5 @@
 FROM golang:1.23
 
-ARG GITHUB_TOKEN=${GITHUB_TOKEN}
-ENV GITHUB_TOKEN=${GITHUB_TOKEN}
-
 ARG GH_AUTH_TOKEN=${GH_AUTH_TOKEN}
 ENV GH_AUTH_TOKEN=${GH_AUTH_TOKEN}
 
@@ -24,7 +21,7 @@ COPY *.go ./
 COPY entrypoint.sh /entrypoint.sh
 
 RUN #CGO_ENABLED=0 GOOS=linux go build -o /prwhisper
-RUN go build -o /app/prwhisper
+RUN go build -o /pr-whisper/prwhisper
 
 RUN chmod +x /entrypoint.sh
 

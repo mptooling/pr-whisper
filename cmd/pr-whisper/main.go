@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// todo :: move to client adapter
 func getPRFiles(token, repo, pullRequestNumber string) (DiffEntries, error) {
 	client := NewPrFilesClient("https://api.github.com", token, repo, pullRequestNumber)
 
@@ -34,16 +35,26 @@ func main() {
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
 
+	config := NewConfig("whispers.yaml")
+	whispersConfig, err := config.loadConfig()
+	if err != nil {
+		fmt.Println("Error loading config:", err)
+		return
+	}
+
+	factory := NewGenericWhispererFactory()
+
+	whispers := factory.MakeGenericWhispers(whispersConfig)
+
+	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
+
+	processor := NewWhisperProcessor(whispers, reviewer)
+
 	files, err := getPRFiles(token, repo, pullNumber)
 	if err != nil {
 		fmt.Println("Error getting PR files:", err)
 		return
 	}
 
-	wp := NewWhisperPool()
-	wp.AddWhisper(NewOasConsistencyWhisper())
-	wp.AddWhisper(NewApiBcBreakWhisper())
-	wp.AddWhisper(NewOasVersionWhisper())
-	processor := NewWhisperProcessor(wp, NewPrReviewer("https://api.github.com", token, repo, pullNumber))
 	processor.ProcessWhispers(files)
 }
