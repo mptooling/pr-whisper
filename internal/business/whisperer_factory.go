@@ -11,14 +11,14 @@ func NewGenericWhispererFactory() *GenericWhispererFactory {
 	return &GenericWhispererFactory{}
 }
 
-func (w GenericWhispererFactory) MakeGenericWhispers(config *domain.WhisperConfig) []*GenericWhisperer {
-	whispers := make([]*GenericWhisperer, 0)
+func (w GenericWhispererFactory) MakeGenericWhispers(config *domain.WhisperConfig) []*domain.GenericWhisperer {
+	whispers := make([]*domain.GenericWhisperer, 0)
 	for _, whisper := range config.Whispers {
 		if whisper.Triggers == nil || len(whisper.Triggers) == 0 {
 			continue
 		}
 
-		checks := make([]CommentCondition, 0)
+		checks := make([]domain.CommentCondition, 0)
 		for _, trigger := range whisper.Triggers {
 			if trigger.Check == "filepath" {
 				checks = append(checks, func(change domain.DiffEntry, changes domain.DiffEntries) bool {
@@ -69,10 +69,10 @@ func (w GenericWhispererFactory) MakeGenericWhispers(config *domain.WhisperConfi
 			severity = domain.Note
 		}
 
-		whispers = append(whispers, &GenericWhisperer{
+		whispers = append(whispers, &domain.GenericWhisperer{
 			Name: whisper.Name,
-			Trigger: trigger{
-				checks: checks,
+			Trigger: domain.WhisperTrigger{
+				Checks: checks,
 			},
 			Severity: severity,
 			Message:  whisper.Message,

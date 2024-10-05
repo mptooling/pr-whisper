@@ -3,15 +3,19 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/mptooling/pr-whisper/internal/adapters"
+	"github.com/mptooling/pr-whisper/internal/business"
+	config2 "github.com/mptooling/pr-whisper/internal/config"
+	"github.com/mptooling/pr-whisper/internal/domain"
 	"io"
 	"os"
 )
 
 // todo :: move to client adapter
-func getPRFiles(token, repo, pullRequestNumber string) (DiffEntries, error) {
-	client := NewPrFilesClient("https://api.github.com", token, repo, pullRequestNumber)
+func getPRFiles(token, repo, pullRequestNumber string) (domain.DiffEntries, error) {
+	client := adapters.NewPrFilesClient("https://api.github.com", token, repo, pullRequestNumber)
 
-	resp, err := client.getPrFiles()
+	resp, err := client.GetPrFiles()
 	if err != nil {
 		return nil, err
 	}
@@ -22,7 +26,7 @@ func getPRFiles(token, repo, pullRequestNumber string) (DiffEntries, error) {
 		return nil, err
 	}
 
-	var files DiffEntries
+	var files domain.DiffEntries
 	if err := json.Unmarshal(body, &files); err != nil {
 		return nil, err
 	}
@@ -35,20 +39,20 @@ func main() {
 	repo := os.Getenv("GITHUB_REPOSITORY")
 	pullNumber := os.Getenv("GITHUB_PULL_REQUEST_NUMBER")
 
-	config := NewConfig("whispers.yaml")
-	whispersConfig, err := config.loadConfig()
+	config := config2.NewConfig("whispers.yaml")
+	whispersConfig, err := config.LoadConfig()
 	if err != nil {
 		fmt.Println("Error loading config:", err)
 		return
 	}
 
-	factory := NewGenericWhispererFactory()
+	factory := business.NewGenericWhispererFactory()
 
 	whispers := factory.MakeGenericWhispers(whispersConfig)
 
-	reviewer := NewPrReviewer("https://api.github.com", token, repo, pullNumber)
+	reviewer := adapters.NewPrReviewer("https://api.github.com", token, repo, pullNumber)
 
-	processor := NewWhisperProcessor(whispers, reviewer)
+	processor := business.NewWhisperProcessor(whispers, reviewer)
 
 	files, err := getPRFiles(token, repo, pullNumber)
 	if err != nil {

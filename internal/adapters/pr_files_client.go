@@ -25,7 +25,7 @@ func NewPrFilesClient(apiUrl string, token string, repo string, pullRequestNumbe
 	}
 }
 
-func (client PrFilesClient) getPrFiles() (*http.Response, error) {
+func (client PrFilesClient) GetPrFiles() (*http.Response, error) {
 	resp, err := http.DefaultClient.Do(client.request)
 	fmt.Println("Request:", client.request)
 	fmt.Println("Response:", resp)

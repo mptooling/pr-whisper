@@ -10,6 +10,10 @@ type MockReviewer struct {
 	err error
 }
 
+func (mr *MockReviewer) Comment(comments []*domain.Comment) error {
+	return nil
+}
+
 func (mr *MockReviewer) comment(comments []*domain.Comment) error {
 	return mr.err
 }
@@ -23,16 +27,16 @@ func InvalidCheck(change domain.DiffEntry, changes domain.DiffEntries) bool {
 }
 
 func ProcessWhispers_ValidChanges(t *testing.T) {
-	whisper := &GenericWhisperer{
+	whisper := &domain.GenericWhisperer{
 		Name:     "Valid Whisper",
 		Message:  "Valid message",
 		Severity: domain.Caution,
-		Trigger: trigger{
-			checks: []CommentCondition{ValidCheck},
+		Trigger: domain.WhisperTrigger{
+			Checks: []domain.CommentCondition{ValidCheck},
 		},
 	}
 	reviewer := &MockReviewer{}
-	processor := NewWhisperProcessor([]*GenericWhisperer{whisper}, reviewer)
+	processor := NewWhisperProcessor([]*domain.GenericWhisperer{whisper}, reviewer)
 
 	changes := domain.DiffEntries{
 		{Filename: "file1.go", Sha: "abc123"},
@@ -42,16 +46,16 @@ func ProcessWhispers_ValidChanges(t *testing.T) {
 }
 
 func ProcessWhispers_InvalidChanges(t *testing.T) {
-	whisper := &GenericWhisperer{
+	whisper := &domain.GenericWhisperer{
 		Name:     "Invalid Whisper",
 		Message:  "Invalid message",
 		Severity: domain.Caution,
-		Trigger: trigger{
-			checks: []CommentCondition{ValidCheck},
+		Trigger: domain.WhisperTrigger{
+			Checks: []domain.CommentCondition{ValidCheck},
 		},
 	}
 	reviewer := &MockReviewer{}
-	processor := NewWhisperProcessor([]*GenericWhisperer{whisper}, reviewer)
+	processor := NewWhisperProcessor([]*domain.GenericWhisperer{whisper}, reviewer)
 
 	changes := domain.DiffEntries{
 		{Filename: "file1.go", Sha: "abc123"},
@@ -61,16 +65,16 @@ func ProcessWhispers_InvalidChanges(t *testing.T) {
 }
 
 func ProcessWhispers_ReviewerError(t *testing.T) {
-	whisper := &GenericWhisperer{
+	whisper := &domain.GenericWhisperer{
 		Name:     "Valid Whisper",
 		Message:  "Valid message",
 		Severity: domain.Caution,
-		Trigger: trigger{
-			checks: []CommentCondition{ValidCheck},
+		Trigger: domain.WhisperTrigger{
+			Checks: []domain.CommentCondition{ValidCheck},
 		},
 	}
 	reviewer := &MockReviewer{err: errors.New("reviewer error")}
-	processor := NewWhisperProcessor([]*GenericWhisperer{whisper}, reviewer)
+	processor := NewWhisperProcessor([]*domain.GenericWhisperer{whisper}, reviewer)
 
 	changes := domain.DiffEntries{
 		{Filename: "file1.go", Sha: "abc123"},
