@@ -8,10 +8,10 @@ import (
 
 type WhisperProcessor struct {
 	whisperPool []*domain.GenericWhisperer
-	reviewer    adapters.PrClient
+	reviewer    adapters.PrReviewer
 }
 
-func NewWhisperProcessor(whisperPool []*domain.GenericWhisperer, reviewer adapters.PrClient) *WhisperProcessor {
+func NewWhisperProcessor(whisperPool []*domain.GenericWhisperer, reviewer adapters.PrReviewer) *WhisperProcessor {
 	return &WhisperProcessor{
 		whisperPool: whisperPool,
 		reviewer:    reviewer,
