@@ -1,21 +1,25 @@
-package main
+package business
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/mptooling/pr-whisper/internal/adapters"
+	"github.com/mptooling/pr-whisper/internal/domain"
+)
 
 type WhisperProcessor struct {
 	whisperPool []*GenericWhisperer
-	reviewer    PrClient
+	reviewer    adapters.PrClient
 }
 
-func NewWhisperProcessor(whisperPool []*GenericWhisperer, reviewer PrClient) *WhisperProcessor {
+func NewWhisperProcessor(whisperPool []*GenericWhisperer, reviewer adapters.PrClient) *WhisperProcessor {
 	return &WhisperProcessor{
 		whisperPool: whisperPool,
 		reviewer:    reviewer,
 	}
 }
 
-func (wp *WhisperProcessor) ProcessWhispers(changes DiffEntries) {
-	comments := make([]*Comment, 0)
+func (wp *WhisperProcessor) ProcessWhispers(changes domain.DiffEntries) {
+	comments := make([]*domain.Comment, 0)
 	for _, change := range changes {
 		for _, c := range wp.processChange(change, changes) {
 			comments = append(comments, c)
@@ -31,8 +35,8 @@ func (wp *WhisperProcessor) ProcessWhispers(changes DiffEntries) {
 	}
 }
 
-func (wp *WhisperProcessor) processChange(change DiffEntry, changes DiffEntries) []*Comment {
-	comments := make([]*Comment, 0)
+func (wp *WhisperProcessor) processChange(change domain.DiffEntry, changes domain.DiffEntries) []*domain.Comment {
+	comments := make([]*domain.Comment, 0)
 	for _, whisper := range wp.whisperPool {
 		c := wp.runWhisperer(whisper, change, changes)
 		if c != nil {
@@ -43,7 +47,7 @@ func (wp *WhisperProcessor) processChange(change DiffEntry, changes DiffEntries)
 	return comments
 }
 
-func (wp *WhisperProcessor) runWhisperer(w *GenericWhisperer, change DiffEntry, changes DiffEntries) *Comment {
+func (wp *WhisperProcessor) runWhisperer(w *GenericWhisperer, change domain.DiffEntry, changes domain.DiffEntries) *domain.Comment {
 	if len(w.Trigger.checks) == 0 {
 		return nil
 	}
@@ -54,7 +58,7 @@ func (wp *WhisperProcessor) runWhisperer(w *GenericWhisperer, change DiffEntry, 
 		}
 	}
 
-	return &Comment{
+	return &domain.Comment{
 		WhisperName: w.Name,
 		Content:     w.Message,
 		Severity:    w.Severity,

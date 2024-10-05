@@ -1,0 +1,7 @@
+whispers:
+    -   name: "Resource BC break"
+        comments: "Oh snap, you broke the API contract."
+        has_severity_level: "caution"
+        comment_rules:
+            - when: "{filepath} contains `pr-whisper/Http/Resources`"
+            - and: "{file_status} oneOf `modified,removed`"

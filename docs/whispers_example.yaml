@@ -2,7 +2,7 @@ whispers:
     -   name: "Resource BC break"
         triggers:
             -   check: "filepath"
-                contains: "app/Http/Resources"
+                contains: "pr-whisper/Http/Resources"
             -   check: "file_statuses"
                 contains: "modified,removed"
         severity: "caution"
@@ -11,7 +11,7 @@ whispers:
     -   name: "Controller BC break"
         triggers:
             -   check: "filepath"
-                contains: "app/Http/Controllers"
+                contains: "pr-whisper/Http/Controllers"
             -   check: "file_statuses"
                 contains: "modified,removed"
         severity: "caution"
@@ -22,7 +22,7 @@ whispers:
             -   check: "file_statuses"
                 contains: "modified,added,removed"
             -   check: "filepath"
-                contains: "app/Http/Resources"
+                contains: "pr-whisper/Http/Resources"
             -   check: "file_not_in_pr"
                 contains: "resources/apidoc/specification.yaml"
         severity: "warning"

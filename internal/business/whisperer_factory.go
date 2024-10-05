@@ -1,21 +1,9 @@
-package main
+package business
 
 import (
+	"github.com/mptooling/pr-whisper/internal/domain"
 	"strings"
 )
-
-type CommentCondition func(DiffEntry, DiffEntries) bool
-
-type trigger struct {
-	checks []CommentCondition
-}
-
-type GenericWhisperer struct {
-	Name     string
-	Trigger  trigger
-	Severity int
-	Message  string
-}
 
 type GenericWhispererFactory struct{}
 
@@ -23,7 +11,7 @@ func NewGenericWhispererFactory() *GenericWhispererFactory {
 	return &GenericWhispererFactory{}
 }
 
-func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*GenericWhisperer {
+func (w GenericWhispererFactory) MakeGenericWhispers(config *domain.WhisperConfig) []*GenericWhisperer {
 	whispers := make([]*GenericWhisperer, 0)
 	for _, whisper := range config.Whispers {
 		if whisper.Triggers == nil || len(whisper.Triggers) == 0 {
@@ -33,7 +21,7 @@ func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*G
 		checks := make([]CommentCondition, 0)
 		for _, trigger := range whisper.Triggers {
 			if trigger.Check == "filepath" {
-				checks = append(checks, func(change DiffEntry, changes DiffEntries) bool {
+				checks = append(checks, func(change domain.DiffEntry, changes domain.DiffEntries) bool {
 					return strings.Contains(change.Filename, trigger.Contains)
 				})
 
@@ -42,7 +30,7 @@ func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*G
 
 			if trigger.Check == "file_not_in_pr" {
 				filePath := trigger.Contains
-				checks = append(checks, func(change DiffEntry, changes DiffEntries) bool {
+				checks = append(checks, func(change domain.DiffEntry, changes domain.DiffEntries) bool {
 					for _, c := range changes {
 						if strings.Contains(c.Filename, filePath) {
 							return false
@@ -55,7 +43,7 @@ func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*G
 			}
 
 			if trigger.Check == "file_status" {
-				checks = append(checks, func(change DiffEntry, changes DiffEntries) bool {
+				checks = append(checks, func(change domain.DiffEntry, changes domain.DiffEntries) bool {
 					statuses := strings.Split(trigger.Contains, ",")
 					for _, fileStatus := range statuses {
 						if change.Status == fileStatus {
@@ -67,18 +55,18 @@ func (w GenericWhispererFactory) MakeGenericWhispers(config *WhisperConfig) []*G
 			}
 		}
 
-		severity := Note
+		severity := domain.Note
 		switch whisper.Severity {
 		case "warning":
-			severity = Warning
+			severity = domain.Warning
 		case "important":
-			severity = Important
+			severity = domain.Important
 		case "tip":
-			severity = Tip
+			severity = domain.Tip
 		case "caution":
-			severity = Caution
+			severity = domain.Caution
 		default:
-			severity = Note
+			severity = domain.Note
 		}
 
 		whispers = append(whispers, &GenericWhisperer{

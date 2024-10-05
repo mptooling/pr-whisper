@@ -1,18 +1,19 @@
-package main
+package business
 
 import (
+	"github.com/mptooling/pr-whisper/internal/domain"
 	"testing"
 )
 
 func TestMakeGenericWhispers_ValidConfig(t *testing.T) {
-	config := &WhisperConfig{
-		Whispers: []WhisperConfigItem{
+	config := &domain.WhisperConfig{
+		Whispers: []domain.WhisperConfigItem{
 			{
 				Name: "Resource BC break",
-				Triggers: []Trigger{
+				Triggers: []domain.Trigger{
 					{
 						Check:    "filepath",
-						Contains: "app/Http/Resources",
+						Contains: "pr-whisper/Http/Resources",
 					},
 				},
 				Severity: "caution",
@@ -32,7 +33,7 @@ func TestMakeGenericWhispers_ValidConfig(t *testing.T) {
 		t.Fatalf("Expected whisper name to be 'Resource BC break', got %s", whispers[0].Name)
 	}
 
-	if whispers[0].Severity != Caution {
+	if whispers[0].Severity != domain.Caution {
 		t.Fatalf("Expected whisper severity to be 'Caution', got %d", whispers[0].Severity)
 	}
 

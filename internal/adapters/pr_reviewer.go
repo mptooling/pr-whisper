@@ -1,15 +1,16 @@
-package main
+package adapters
 
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/mptooling/pr-whisper/internal/domain"
 	"io"
 	"net/http"
 )
 
 type PrClient interface {
-	comment([]*Comment) error
+	comment([]*domain.Comment) error
 }
 
 type PrReviewer struct {
@@ -31,7 +32,7 @@ func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) *PrReviewer {
 	}
 }
 
-func (client PrReviewer) comment(comments []*Comment) error {
+func (client PrReviewer) comment(comments []*domain.Comment) error {
 	if len(comments) == 0 {
 		fmt.Println("No comments to make")
 		return nil
@@ -40,8 +41,8 @@ func (client PrReviewer) comment(comments []*Comment) error {
 	return client.commentWhispers(comments)
 }
 
-func (client PrReviewer) commentWhispers(comments []*Comment) error {
-	content := make(map[string][]Comment)
+func (client PrReviewer) commentWhispers(comments []*domain.Comment) error {
+	content := make(map[string][]domain.Comment)
 	for _, comment := range comments {
 		content[comment.WhisperName] = append(content[comment.WhisperName], *comment)
 	}
@@ -57,7 +58,7 @@ func (client PrReviewer) commentWhispers(comments []*Comment) error {
 
 	body += "\n" + `</details>` + "\n"
 
-	review := PRReview{
+	review := domain.PRReview{
 		Body:  body,
 		Event: "COMMENT",
 	}
@@ -115,11 +116,11 @@ func (client PrReviewer) send(jsonData []byte) error {
 
 func (client PrReviewer) getEmojiForSection(severity int) string {
 	switch severity {
-	case Important:
+	case domain.Important:
 		return "🟣"
-	case Warning:
+	case domain.Warning:
 		return "🟠"
-	case Caution:
+	case domain.Caution:
 		return "🔴"
 	default:
 		return "🟢"

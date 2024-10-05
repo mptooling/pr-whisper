@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"os"
@@ -13,14 +13,14 @@ whispers:
   - name: "Resource BC break"
     triggers:
       - check: "filepath"
-        contains: "app/Http/Resources"
+        contains: "pr-whisper/Http/Resources"
     severity: "caution"
     message: "This change may break the API contract. Please review the API documentation."
 
   - name: "Controller BC break"
     triggers:
       - check: "filepath"
-        contains: "app/Http/Controllers"
+        contains: "pr-whisper/Http/Controllers"
     severity: "caution"
     message: "This change may break the API contract. Please review the API documentation."
 `

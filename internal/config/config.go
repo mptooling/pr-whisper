@@ -1,6 +1,7 @@
-package main
+package config
 
 import (
+	"github.com/mptooling/pr-whisper/internal/domain"
 	"gopkg.in/yaml.v2"
 	"os"
 )
@@ -15,13 +16,13 @@ func NewConfig(configPath string) *Config {
 	}
 }
 
-func (c Config) loadConfig() (*WhisperConfig, error) {
+func (c Config) loadConfig() (*domain.WhisperConfig, error) {
 	data, err := os.ReadFile(c.configPath)
 	if err != nil {
 		return nil, err
 	}
 
-	var config WhisperConfig
+	var config domain.WhisperConfig
 	err = yaml.Unmarshal(data, &config)
 	if err != nil {
 		return nil, err

@@ -1,4 +1,4 @@
-package main
+package domain
 
 const (
 	Note = iota
@@ -23,6 +23,19 @@ type DiffEntry struct {
 }
 
 type DiffEntries []DiffEntry
+
+type CommentCondition func(DiffEntry, DiffEntries) bool
+
+type trigger struct {
+	checks []CommentCondition
+}
+
+type GenericWhisperer struct {
+	Name     string
+	Trigger  trigger
+	Severity int
+	Message  string
+}
 
 type Comment struct {
 	WhisperName string
