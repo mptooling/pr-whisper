@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// Test the loadConfig function with a valid YAML file
+// Test the LoadConfig function with a valid YAML file
 func TestLoadConfig_ValidConfig(t *testing.T) {
 	// Create a sample YAML configuration
 	yamlContent := `
@@ -40,7 +40,7 @@ whispers:
 
 	// Create a new config and load the file
 	config := NewConfig(tmpFile.Name())
-	whisperConfig, err := config.loadConfig()
+	whisperConfig, err := config.LoadConfig()
 
 	if err != nil {
 		t.Fatalf("Failed to load config: %v", err)
@@ -60,7 +60,7 @@ whispers:
 	}
 }
 
-// Test the loadConfig function with an invalid YAML file
+// Test the LoadConfig function with an invalid YAML file
 func TestLoadConfig_InvalidYAML(t *testing.T) {
 	// Create an invalid YAML content
 	invalidYAMLContent := `
@@ -85,7 +85,7 @@ whispers:
 
 	// Attempt to load the invalid config
 	config := NewConfig(tmpfile.Name())
-	_, err = config.loadConfig()
+	_, err = config.LoadConfig()
 
 	if err == nil {
 		t.Fatalf("Expected error when loading invalid YAML, but got none")

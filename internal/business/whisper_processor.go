@@ -7,11 +7,11 @@ import (
 )
 
 type WhisperProcessor struct {
-	whisperPool []*GenericWhisperer
+	whisperPool []*domain.GenericWhisperer
 	reviewer    adapters.PrClient
 }
 
-func NewWhisperProcessor(whisperPool []*GenericWhisperer, reviewer adapters.PrClient) *WhisperProcessor {
+func NewWhisperProcessor(whisperPool []*domain.GenericWhisperer, reviewer adapters.PrClient) *WhisperProcessor {
 	return &WhisperProcessor{
 		whisperPool: whisperPool,
 		reviewer:    reviewer,
@@ -27,7 +27,7 @@ func (wp *WhisperProcessor) ProcessWhispers(changes domain.DiffEntries) {
 	}
 
 	fmt.Println("collected comments:", comments)
-	err := wp.reviewer.comment(comments)
+	err := wp.reviewer.Comment(comments)
 	if err != nil {
 		fmt.Println("Error commenting on PR:", err)
 
@@ -47,12 +47,12 @@ func (wp *WhisperProcessor) processChange(change domain.DiffEntry, changes domai
 	return comments
 }
 
-func (wp *WhisperProcessor) runWhisperer(w *GenericWhisperer, change domain.DiffEntry, changes domain.DiffEntries) *domain.Comment {
-	if len(w.Trigger.checks) == 0 {
+func (wp *WhisperProcessor) runWhisperer(w *domain.GenericWhisperer, change domain.DiffEntry, changes domain.DiffEntries) *domain.Comment {
+	if len(w.Trigger.Checks) == 0 {
 		return nil
 	}
 
-	for _, check := range w.Trigger.checks {
+	for _, check := range w.Trigger.Checks {
 		if false == check(change, changes) {
 			return nil
 		}

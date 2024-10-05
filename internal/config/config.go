@@ -16,7 +16,7 @@ func NewConfig(configPath string) *Config {
 	}
 }
 
-func (c Config) loadConfig() (*domain.WhisperConfig, error) {
+func (c Config) LoadConfig() (*domain.WhisperConfig, error) {
 	data, err := os.ReadFile(c.configPath)
 	if err != nil {
 		return nil, err

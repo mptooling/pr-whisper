@@ -26,13 +26,13 @@ type DiffEntries []DiffEntry
 
 type CommentCondition func(DiffEntry, DiffEntries) bool
 
-type trigger struct {
-	checks []CommentCondition
+type WhisperTrigger struct {
+	Checks []CommentCondition
 }
 
 type GenericWhisperer struct {
 	Name     string
-	Trigger  trigger
+	Trigger  WhisperTrigger
 	Severity int
 	Message  string
 }

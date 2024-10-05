@@ -10,7 +10,7 @@ import (
 )
 
 type PrClient interface {
-	comment([]*domain.Comment) error
+	Comment([]*domain.Comment) error
 }
 
 type PrReviewer struct {
@@ -32,7 +32,7 @@ func NewPrReviewer(apiUrl, token, repo, pullRequestNumber string) *PrReviewer {
 	}
 }
 
-func (client PrReviewer) comment(comments []*domain.Comment) error {
+func (client PrReviewer) Comment(comments []*domain.Comment) error {
 	if len(comments) == 0 {
 		fmt.Println("No comments to make")
 		return nil
